@@ -1,15 +1,21 @@
 const chatList = document.getElementById("chatList");
 const messageInput = document.getElementById("messageInput");
-const voiceToggleBtn = document.getElementById("voiceToggleBtn");
+const recordBtn = document.getElementById("recordBtn");
+const emojiBtn = document.getElementById("emojiBtn");
 const sendToggleBtn = document.getElementById("sendToggleBtn");
-const talkButton = document.getElementById("talkButton");
+const plusPanel = document.getElementById("plusPanel");
+const emojiPanel = document.getElementById("emojiPanel");
 const imageInput = document.getElementById("imageInput");
-const audioInput = document.getElementById("audioInput");
+const cameraInput = document.getElementById("cameraInput");
 const clearDataBtn = document.getElementById("clearDataBtn");
 const storageKey = "simpleChatMessages";
 
 let messages = [];
-let voiceMode = false;
+let mediaRecorder = null;
+let recorderStream = null;
+let isRecording = false;
+let recordTimeout = null;
+const RECORD_START_DELAY = 300;
 
 function adjustTextareaHeight() {
   messageInput.style.height = "auto";
@@ -19,13 +25,21 @@ function adjustTextareaHeight() {
   messageInput.style.overflowY = messageInput.scrollHeight > maxHeight ? "auto" : "hidden";
 }
 
+function closePanels() {
+  plusPanel.classList.remove("active");
+  plusPanel.setAttribute("aria-hidden", "true");
+  emojiPanel.classList.remove("active");
+  emojiPanel.setAttribute("aria-hidden", "true");
+}
+
+function setRecordingState(active) {
+  isRecording = active;
+  recordBtn.classList.toggle("recording", active);
+  recordBtn.textContent = active ? "🎙 录音中" : "🎙";
+}
+
 function updateSendToggleButton() {
   const hasText = messageInput.value.trim().length > 0;
-  if (voiceMode) {
-    sendToggleBtn.textContent = "+";
-    sendToggleBtn.classList.remove("send-mode");
-    return;
-  }
   if (hasText) {
     sendToggleBtn.textContent = "发送";
     sendToggleBtn.classList.add("send-mode");
@@ -35,17 +49,54 @@ function updateSendToggleButton() {
   }
 }
 
-function updateInputMode() {
-  if (voiceMode) {
-    messageInput.classList.add("hidden-input");
-    talkButton.classList.add("active");
-  } else {
-    messageInput.classList.remove("hidden-input");
-    talkButton.classList.remove("active");
+async function startRecording() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert("当前浏览器不支持录音功能。");
+    return;
   }
-  adjustTextareaHeight();
-  updateSendToggleButton();
+
+  try {
+    recorderStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(recorderStream);
+    const chunks = [];
+
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data && event.data.size > 0) {
+        chunks.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(chunks, { type: "audio/webm" });
+      const reader = new FileReader();
+      reader.onload = () => {
+        pushMessage({ type: "audio", src: reader.result, filename: "录音.webm" });
+      };
+      reader.readAsDataURL(blob);
+      recorderStream.getTracks().forEach((track) => track.stop());
+      recorderStream = null;
+      mediaRecorder = null;
+      setRecordingState(false);
+    };
+
+    mediaRecorder.start();
+    setRecordingState(true);
+  } catch (error) {
+    console.error(error);
+    alert("录音权限被拒绝或设备不可用。请检查浏览器权限设置。");
+  }
 }
+
+function stopRecording() {
+  if (!isRecording || !mediaRecorder) return;
+  mediaRecorder.stop();
+}
+
+window.addEventListener("beforeunload", () => {
+  if (recorderStream) {
+    recorderStream.getTracks().forEach((track) => track.stop());
+  }
+});
 
 function formatTime(date) {
   return `${date.getHours().toString().padStart(2, "0")}:${date
@@ -133,19 +184,40 @@ async function handleFileInput(input, type) {
 }
 
 sendToggleBtn.addEventListener("click", () => {
-  if (voiceMode) return;
   const text = messageInput.value.trim();
-  if (!text) return;
-  pushMessage({ type: "text", text });
-  messageInput.value = "";
-  adjustTextareaHeight();
-  updateSendToggleButton();
-  messageInput.focus();
+  if (text) {
+    pushMessage({ type: "text", text });
+    messageInput.value = "";
+    adjustTextareaHeight();
+    updateSendToggleButton();
+    closePanels();
+    messageInput.focus();
+    return;
+  }
+
+  const open = !plusPanel.classList.contains("active");
+  closePanels();
+  if (open) {
+    plusPanel.classList.add("active");
+    plusPanel.setAttribute("aria-hidden", "false");
+  }
+});
+
+emojiBtn.addEventListener("click", () => {
+  const open = !emojiPanel.classList.contains("active");
+  closePanels();
+  if (open) {
+    emojiPanel.classList.add("active");
+    emojiPanel.setAttribute("aria-hidden", "false");
+  }
 });
 
 messageInput.addEventListener("input", () => {
   adjustTextareaHeight();
   updateSendToggleButton();
+  if (messageInput.value.trim().length > 0) {
+    plusPanel.classList.remove("active");
+  }
 });
 
 messageInput.addEventListener("keydown", (event) => {
@@ -155,13 +227,73 @@ messageInput.addEventListener("keydown", (event) => {
   }
 });
 
-voiceToggleBtn.addEventListener("click", () => {
-  voiceMode = !voiceMode;
-  updateInputMode();
+recordBtn.addEventListener("mousedown", (event) => {
+  event.preventDefault();
+  recordTimeout = setTimeout(() => startRecording(), RECORD_START_DELAY);
+});
+
+recordBtn.addEventListener("touchstart", (event) => {
+  event.preventDefault();
+  recordTimeout = setTimeout(() => startRecording(), RECORD_START_DELAY);
+});
+
+document.addEventListener("mouseup", () => {
+  clearTimeout(recordTimeout);
+  stopRecording();
+});
+
+document.addEventListener("touchend", () => {
+  clearTimeout(recordTimeout);
+  stopRecording();
+});
+
+document.addEventListener("touchcancel", () => {
+  clearTimeout(recordTimeout);
+  stopRecording();
+});
+
+recordBtn.addEventListener("mouseleave", () => {
+  if (!isRecording) {
+    clearTimeout(recordTimeout);
+  }
 });
 
 imageInput.addEventListener("change", () => handleFileInput(imageInput, "image"));
-audioInput.addEventListener("change", () => handleFileInput(audioInput, "audio"));
+cameraInput.addEventListener("change", () => handleFileInput(cameraInput, "image"));
+
+emojiPanel.addEventListener("click", (event) => {
+  const emojiButton = event.target.closest(".emoji-option");
+  if (!emojiButton) return;
+  const emoji = emojiButton.textContent;
+  const start = messageInput.selectionStart;
+  const end = messageInput.selectionEnd;
+  const value = messageInput.value;
+  messageInput.value = `${value.slice(0, start)}${emoji}${value.slice(end)}`;
+  messageInput.focus();
+  messageInput.selectionStart = messageInput.selectionEnd = start + emoji.length;
+  adjustTextareaHeight();
+  updateSendToggleButton();
+});
+
+document.addEventListener("click", (event) => {
+  const target = event.target;
+  if (!target.closest(".panel-group") && !target.closest(".emoji-panel") && target !== emojiBtn) {
+    closePanels();
+  }
+});
+
+document.querySelectorAll(".panel-action[data-action]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const action = button.dataset.action;
+    if (action === "file") {
+      alert("文件功能待扩展，可在这里添加上传文档逻辑。");
+    }
+    if (action === "location") {
+      alert("位置功能待扩展，可在这里添加位置分享逻辑。");
+    }
+    closePanels();
+  });
+});
 
 clearDataBtn.addEventListener("click", () => {
   if (!confirm("确认要清空所有聊天记录？")) return;
@@ -172,5 +304,4 @@ clearDataBtn.addEventListener("click", () => {
 
 loadMessages();
 renderMessages();
-updateInputMode();
 updateSendToggleButton();
