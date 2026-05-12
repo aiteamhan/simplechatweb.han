@@ -1,12 +1,51 @@
 const chatList = document.getElementById("chatList");
 const messageInput = document.getElementById("messageInput");
-const sendBtn = document.getElementById("sendBtn");
+const voiceToggleBtn = document.getElementById("voiceToggleBtn");
+const sendToggleBtn = document.getElementById("sendToggleBtn");
+const talkButton = document.getElementById("talkButton");
 const imageInput = document.getElementById("imageInput");
 const audioInput = document.getElementById("audioInput");
 const clearDataBtn = document.getElementById("clearDataBtn");
 const storageKey = "simpleChatMessages";
 
 let messages = [];
+let voiceMode = false;
+
+function adjustTextareaHeight() {
+  messageInput.style.height = "auto";
+  const maxHeight = 140;
+  const height = Math.min(messageInput.scrollHeight, maxHeight);
+  messageInput.style.height = `${height}px`;
+  messageInput.style.overflowY = messageInput.scrollHeight > maxHeight ? "auto" : "hidden";
+}
+
+function updateSendToggleButton() {
+  const hasText = messageInput.value.trim().length > 0;
+  if (voiceMode) {
+    sendToggleBtn.textContent = "+";
+    sendToggleBtn.classList.remove("send-mode");
+    return;
+  }
+  if (hasText) {
+    sendToggleBtn.textContent = "发送";
+    sendToggleBtn.classList.add("send-mode");
+  } else {
+    sendToggleBtn.textContent = "+";
+    sendToggleBtn.classList.remove("send-mode");
+  }
+}
+
+function updateInputMode() {
+  if (voiceMode) {
+    messageInput.classList.add("hidden-input");
+    talkButton.classList.add("active");
+  } else {
+    messageInput.classList.remove("hidden-input");
+    talkButton.classList.remove("active");
+  }
+  adjustTextareaHeight();
+  updateSendToggleButton();
+}
 
 function formatTime(date) {
   return `${date.getHours().toString().padStart(2, "0")}:${date
@@ -93,19 +132,32 @@ async function handleFileInput(input, type) {
   input.value = "";
 }
 
-sendBtn.addEventListener("click", () => {
+sendToggleBtn.addEventListener("click", () => {
+  if (voiceMode) return;
   const text = messageInput.value.trim();
   if (!text) return;
   pushMessage({ type: "text", text });
   messageInput.value = "";
+  adjustTextareaHeight();
+  updateSendToggleButton();
   messageInput.focus();
+});
+
+messageInput.addEventListener("input", () => {
+  adjustTextareaHeight();
+  updateSendToggleButton();
 });
 
 messageInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
-    sendBtn.click();
+    sendToggleBtn.click();
   }
+});
+
+voiceToggleBtn.addEventListener("click", () => {
+  voiceMode = !voiceMode;
+  updateInputMode();
 });
 
 imageInput.addEventListener("change", () => handleFileInput(imageInput, "image"));
@@ -120,3 +172,5 @@ clearDataBtn.addEventListener("click", () => {
 
 loadMessages();
 renderMessages();
+updateInputMode();
+updateSendToggleButton();
