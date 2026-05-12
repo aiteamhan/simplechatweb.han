@@ -90,7 +90,13 @@ input {
 .chat-input-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+}
+
+.right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .icon-button {
@@ -112,12 +118,16 @@ input {
   transform: translateY(-1px);
 }
 
-.voice-button {
+.emoji-button {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.record-button {
   background: linear-gradient(180deg, #007aff 0%, #0059d6 100%);
 }
 
-.emoji-button {
-  background: rgba(255, 255, 255, 0.10);
+.record-button.recording {
+  background: #ff3b30;
 }
 
 .plus-button {
@@ -142,10 +152,10 @@ input {
   align-items: center;
 }
 
-.text-input-shell textarea,
-.text-input-shell .talk-button {
+.text-input-shell textarea {
   width: 100%;
   min-height: 44px;
+  max-height: 140px;
   border-radius: 22px;
   border: 1px solid #0059d6;
   background: #ffffff;
@@ -154,48 +164,107 @@ input {
   font-size: 0.96rem;
   line-height: 1.6;
   outline: none;
-}
-
-.text-input-shell textarea {
   resize: none;
   overflow-y: hidden;
-  max-height: 140px;
 }
 
-.text-input-shell textarea.hidden-input {
+.popup-panel {
+  position: absolute;
+  right: 0;
+  bottom: 60px;
+  width: 220px;
+  border-radius: 18px;
+  background: #0f2a5c;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
+  padding: 10px;
+  color: #f5f9ff;
   display: none;
+  z-index: 30;
 }
 
-.text-input-shell .talk-button {
-  display: none;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+.panel-group {
+  position: relative;
 }
 
-.text-input-shell .talk-button.active {
+.popup-panel.active {
+  display: block;
+}
+
+.plus-panel {
+  width: 220px;
+}
+
+.panel-item {
   display: flex;
-}
-
-.upload-row {
-  margin-top: 12px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
   gap: 10px;
+  padding: 12px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-bottom: 10px;
 }
 
-.file-upload {
+.panel-action {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  padding: 12px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px dashed rgba(255, 255, 255, 0.16);
-  color: var(--text);
+  color: #ffffff;
+  width: 100%;
   cursor: pointer;
 }
+
+.panel-note {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.4;
+}
+
+.emoji-panel {
+  width: 260px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.panel-title {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: #d8e8ff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 8px;
+}
+
+.emoji-list {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  padding-bottom: 6px;
+}
+
+.emoji-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.emoji-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+}
+
+.emoji-option {
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  min-height: 40px;
+  cursor: pointer;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.emoji-option:hover {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
 
 .chat-item {
   display: flex;
@@ -228,28 +297,6 @@ input {
   border-radius: 14px;
 }
 
-.input-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.input-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-}
-
-textarea {
-  width: 100%;
-  min-height: 64px;
-  padding: 14px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  resize: vertical;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text);
-}
 
 .button {
   border: none;
@@ -271,26 +318,8 @@ textarea {
   color: var(--text);
 }
 
-.upload-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.file-upload {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px dashed rgba(255, 255, 255, 0.16);
-  color: var(--text);
-  cursor: pointer;
-}
-
-.file-upload input {
+#imageInput,
+#cameraInput {
   display: none;
 }
 
