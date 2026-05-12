@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>简易聊天网页</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1>简易聊天</h1>
+        <p>支持图片、语音和本地数据保存</p>
+      </div>
+      <button id="clearDataBtn" class="button button--secondary">清空记录</button>
+    </header>
+
+    <main class="chat-panel">
+      <div id="chatList" class="chat-list"></div>
+    </main>
+
+    <section class="input-panel">
+      <div class="input-row">
+        <textarea id="messageInput" placeholder="输入聊天内容..." rows="2"></textarea>
+        <button id="sendBtn" class="button">发送</button>
+      </div>
+      <div class="upload-row">
+        <label class="file-upload">
+          <input id="imageInput" type="file" accept="image/*" />
+          传照片
+        </label>
+        <label class="file-upload">
+          <input id="audioInput" type="file" accept="audio/*" />
+          传语音
+        </label>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
