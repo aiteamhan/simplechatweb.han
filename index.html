@@ -22,25 +22,70 @@
 
     <section class="input-panel">
       <div class="chat-input-wrapper">
-        <button id="voiceToggleBtn" class="icon-button voice-button" type="button" aria-label="语音切换">🎤</button>
         <div class="text-input-shell">
           <textarea id="messageInput" placeholder="输入消息..." rows="1"></textarea>
-          <button id="talkButton" class="talk-button" type="button">按住 说话</button>
         </div>
         <div class="right-actions">
+          <button id="recordBtn" class="icon-button record-button" type="button" aria-label="长按录音">🎙</button>
           <button id="emojiBtn" class="icon-button emoji-button" type="button" aria-label="表情">😊</button>
-          <button id="sendToggleBtn" class="icon-button plus-button" type="button" aria-label="发送或更多">+</button>
+          <div class="panel-group">
+            <button id="sendToggleBtn" class="icon-button plus-button" type="button" aria-label="发送或更多">+</button>
+            <div id="plusPanel" class="popup-panel plus-panel" role="menu" aria-hidden="true">
+              <div class="panel-item">
+                <label class="panel-action" for="cameraInput">
+                  <span>📷</span>
+                  <span>拍照</span>
+                </label>
+                <input id="cameraInput" type="file" accept="image/*" capture="environment" />
+              </div>
+              <div class="panel-item">
+                <label class="panel-action" for="imageInput">
+                  <span>🖼️</span>
+                  <span>相册</span>
+                </label>
+                <input id="imageInput" type="file" accept="image/*" />
+              </div>
+              <button class="panel-action" type="button" data-action="file">
+                <span>📎</span>
+                <span>文件</span>
+              </button>
+              <button class="panel-action" type="button" data-action="location">
+                <span>📍</span>
+                <span>位置</span>
+              </button>
+              <div class="panel-note">更多功能入口</div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="upload-row">
-        <label class="file-upload">
-          <input id="imageInput" type="file" accept="image/*" />
-          传照片
-        </label>
-        <label class="file-upload">
-          <input id="audioInput" type="file" accept="audio/*" />
-          传语音
-        </label>
+      <div id="emojiPanel" class="popup-panel emoji-panel" role="menu" aria-hidden="true">
+        <div class="panel-title">表情</div>
+        <div class="emoji-list">
+          <button type="button" class="emoji-option">😊</button>
+          <button type="button" class="emoji-option">😂</button>
+          <button type="button" class="emoji-option">😍</button>
+          <button type="button" class="emoji-option">😢</button>
+          <button type="button" class="emoji-option">👍</button>
+          <button type="button" class="emoji-option">❤️</button>
+          <button type="button" class="emoji-option">😎</button>
+          <button type="button" class="emoji-option">😁</button>
+          <button type="button" class="emoji-option">🙏</button>
+          <button type="button" class="emoji-option">😜</button>
+          <button type="button" class="emoji-option">🎉</button>
+          <button type="button" class="emoji-option">😘</button>
+          <button type="button" class="emoji-option">😅</button>
+          <button type="button" class="emoji-option">😇</button>
+          <button type="button" class="emoji-option">😡</button>
+          <button type="button" class="emoji-option">😱</button>
+          <button type="button" class="emoji-option">💪</button>
+          <button type="button" class="emoji-option">🥰</button>
+          <button type="button" class="emoji-option">🥲</button>
+          <button type="button" class="emoji-option">🤔</button>
+          <button type="button" class="emoji-option">🤩</button>
+          <button type="button" class="emoji-option">🙌</button>
+          <button type="button" class="emoji-option">💬</button>
+          <button type="button" class="emoji-option">🌟</button>
+        </div>
       </div>
     </section>
   </div>
