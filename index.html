@@ -21,9 +21,16 @@
     </main>
 
     <section class="input-panel">
-      <div class="input-row">
-        <textarea id="messageInput" placeholder="输入聊天内容..." rows="2"></textarea>
-        <button id="sendBtn" class="button">发送</button>
+      <div class="chat-input-wrapper">
+        <button id="voiceToggleBtn" class="icon-button voice-button" type="button" aria-label="语音切换">🎤</button>
+        <div class="text-input-shell">
+          <textarea id="messageInput" placeholder="输入消息..." rows="1"></textarea>
+          <button id="talkButton" class="talk-button" type="button">按住 说话</button>
+        </div>
+        <div class="right-actions">
+          <button id="emojiBtn" class="icon-button emoji-button" type="button" aria-label="表情">😊</button>
+          <button id="sendToggleBtn" class="icon-button plus-button" type="button" aria-label="发送或更多">+</button>
+        </div>
       </div>
       <div class="upload-row">
         <label class="file-upload">
